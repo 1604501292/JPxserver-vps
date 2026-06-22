@@ -1,7 +1,7 @@
 
 on:
   schedule:
-    - cron: 0 0,23 * * *
+    - cron: 0 21,22 * * *
   push:
   workflow_dispatch:
 
