@@ -37,7 +37,7 @@ try {
     await page.waitForNavigation({ waitUntil: 'networkidle2' })
     const body = await page.$eval('img[src^="data:"]', img => img.src)
     const code = await fetch('https://captcha-120546510085.asia-northeast1.run.app', { method: 'POST', body }).then(r => r.text())
-await page.locator('[placeholder="上の画像の数字を入力"]').fill(code)
+    await page.locator('[placeholder="上の画像の数字を入力"]').fill(code)
 
     // 等待 Cloudflare iframe 加载
     await setTimeout(2000)
