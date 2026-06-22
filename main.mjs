@@ -39,26 +39,20 @@ try {
     const code = await fetch('https://captcha-120546510085.asia-northeast1.run.app', { method: 'POST', body }).then(r => r.text())
     await page.locator('[placeholder="上の画像の数字を入力"]').fill(code)
 
-    // 处理 Cloudflare 人机验证
+    // 等待 Cloudflare iframe 加载
+    await setTimeout(2000)
     try {
-        const cfFrame = page.frames().find(f => f.url().includes('challenges.cloudflare.com'))
-        if (cfFrame) {
-            await cfFrame.locator('input[type="checkbox"]').click()
-            await setTimeout(3000)
-        } else {
-            // 尝试直接点击页面内的checkbox
-            await page.locator('input[type="checkbox"]').click()
-            await setTimeout(3000)
-        }
+        // 等待 iframe 出现
+        await page.waitForSelector('iframe[src*="cloudflare"]', { timeout: 5000 })
+        const iframeElement = await page.$('iframe[src*="cloudflare"]')
+        const iframe = await iframeElement.contentFrame()
+        await iframe.waitForSelector('input[type="checkbox"]', { timeout: 5000 })
+        await iframe.click('input[type="checkbox"]')
+        console.log('Cloudflare checkbox clicked')
+        await setTimeout(3000)
     } catch (cfError) {
-        console.log('Cloudflare验证处理:', cfError.message)
+        console.log('Cloudflare处理失败:', cfError.message)
     }
 
     await page.locator('text=無料VPSの利用を継続する').click()
-} catch (e) {
-    console.error(e)
-} finally {
-    await setTimeout(5000)
-    await recorder.stop()
-    await browser.close()
-}
+
