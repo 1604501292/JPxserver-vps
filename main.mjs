@@ -38,6 +38,22 @@ try {
     const body = await page.$eval('img[src^="data:"]', img => img.src)
     const code = await fetch('https://captcha-120546510085.asia-northeast1.run.app', { method: 'POST', body }).then(r => r.text())
     await page.locator('[placeholder="上の画像の数字を入力"]').fill(code)
+
+    // 处理 Cloudflare 人机验证
+    try {
+        const cfFrame = page.frames().find(f => f.url().includes('challenges.cloudflare.com'))
+        if (cfFrame) {
+            await cfFrame.locator('input[type="checkbox"]').click()
+            await setTimeout(3000)
+        } else {
+            // 尝试直接点击页面内的checkbox
+            await page.locator('input[type="checkbox"]').click()
+            await setTimeout(3000)
+        }
+    } catch (cfError) {
+        console.log('Cloudflare验证处理:', cfError.message)
+    }
+
     await page.locator('text=無料VPSの利用を継続する').click()
 } catch (e) {
     console.error(e)
