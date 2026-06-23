@@ -1,3 +1,4 @@
+
 on:
   schedule:
     - cron: 0 21,22 * * *
@@ -11,19 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v4
-      
-      # 👇 新增了 xvfb 虚拟显示器的安装
-      - run: sudo apt-get -qq update && sudo apt-get -yqq install --no-install-recommends ffmpeg fonts-noto-cjk xvfb
-      
-      - run: yarn add puppeteer puppeteer-extra puppeteer-extra-plugin-stealth
-      
-      # 👇 使用 xvfb-run 配合虚拟屏幕运行 node 脚本
-      - run: xvfb-run --auto-servernum --server-args="-screen 0 1080x1024x24" node main.mjs
+      - run: sudo apt-get -qq update && sudo apt-get -yqq install --no-install-recommends ffmpeg fonts-noto-cjk
+      - run: yarn add puppeteer
+      - run: node main.mjs
         env:
           EMAIL: ${{ secrets.EMAIL }}
           PASSWORD: ${{ secrets.PASSWORD }}
           PROXY_SERVER: ${{ secrets.PROXY_SERVER }}
-          
       - uses: actions/upload-artifact@v4
         with:
           path: recording.webm
